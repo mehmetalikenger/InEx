@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,12 +34,14 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
     @CreationTimestamp
     private LocalDate createdAt;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.UNCONFIRMED;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Income> incomes;
 
 
     void validatePassword(String rawPassword){

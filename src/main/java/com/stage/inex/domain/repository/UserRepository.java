@@ -1,4 +1,4 @@
-package com.stage.inex.infrastructure.Irepository;
+package com.stage.inex.domain.repository;
 
 import com.stage.inex.domain.model.User;
 
