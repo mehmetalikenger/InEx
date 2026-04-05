@@ -32,12 +32,5 @@ public class Expense {
     @Column(nullable = false)
     private double amount;
 
-    @Column(nullable = false)
-
-    @CreationTimestamp
-    private LocalDate created_at;
-
     private Status status = Status.UNCONFIRMED;
-
-    private LocalDate deleted_at;
 }

@@ -18,9 +18,17 @@ public class User {
         UNCONFIRMED
     }
 
+    public enum Role {
+        ADMIN,
+        USER
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(nullable = false)
+    private Role role;
 
     @Column(nullable = false)
     private String name;
@@ -43,6 +51,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Income> incomes;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Expense> expenses;
+
+    private LocalDate deleted_at;
 
     void validatePassword(String rawPassword){
 
