@@ -1,18 +1,17 @@
 package com.stage.inex.domain.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name="incomes", indexes= {
-        @Index(name="idx_incomes_user_id", columnList = "user")
-        })
-public class Income {
+@Table(name="recurring_incomes", indexes = {
+        @Index(name="idx_recurring_incomes_next_generation_date", columnList = "next_generation_date")
+})
+public class Recurring_Income {
 
-    public enum Status{
+    private enum Status{
         CONFIRMED,
         UNCONFIRMED
     }
@@ -26,7 +25,7 @@ public class Income {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private IncomeCategory category;
+    private ExpenseCategory category;
 
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -34,6 +33,18 @@ public class Income {
 
     @Column(precision = 19, scale = 4, nullable = false)
     private BigDecimal amount;
+
+    @Column(nullable = false)
+    private int frequency;
+
+    @Column(nullable = false)
+    private LocalDate start_date;
+
+    @Column(nullable = false)
+    private LocalDate end_date;
+
+    @Column(nullable = false)
+    private LocalDate next_generation_date;
 
     private Status status = Status.UNCONFIRMED;
 }
