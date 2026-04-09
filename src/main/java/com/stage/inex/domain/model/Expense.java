@@ -32,8 +32,9 @@ public class Expense {
     @JoinColumn(nullable = false)
     private User user;
 
-    @Column(precision =19, scale=4, nullable = false)
+    @Column(precision = 19, scale = 4, nullable = false)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     private Status status = Status.UNCONFIRMED;
 }

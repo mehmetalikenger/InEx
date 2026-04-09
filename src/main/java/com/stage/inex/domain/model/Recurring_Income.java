@@ -11,9 +11,11 @@ import java.time.LocalDate;
 })
 public class Recurring_Income {
 
-    private enum Status{
-        CONFIRMED,
-        UNCONFIRMED
+    private enum Frequency{
+        YEARLY,
+        MONTHLY,
+        WEEKLY,
+        DAILY
     }
 
     @Id
@@ -35,6 +37,7 @@ public class Recurring_Income {
     private BigDecimal amount;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private int frequency;
 
     @Column(nullable = false)
@@ -45,6 +48,4 @@ public class Recurring_Income {
 
     @Column(nullable = false)
     private LocalDate next_generation_date;
-
-    private Status status = Status.UNCONFIRMED;
 }
