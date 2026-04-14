@@ -66,4 +66,29 @@ public class Expense {
 
         this.startDate = startDate;
     }
+
+    public void updateStartDate(LocalDate newStartDate){
+
+        if(this.startDate == null){
+
+            throw new IllegalStateException("Start date is null. Use the setStartDate() method.");
+        }
+
+        if(newStartDate == null){
+
+            throw new IllegalStateException("Start date can't be null.");
+        }
+
+        if(this.startDate.isBefore(LocalDate.now())){
+
+            throw new IllegalStateException("Start date is passed. It cannot be changed.");
+        }
+
+        if(newStartDate.isBefore(LocalDate.now())){
+
+            throw new IllegalArgumentException("Start date can't be earlier than today.");
+        }
+
+        this.startDate = newStartDate;
+    }
 }

@@ -11,13 +11,15 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "incomes", indexes = {
-        @Index(name = "idx_incomes_user_id", columnList = "user")
+        @Index(name = "idx_incomes_user_id", columnList = "user"),
+        @Index(name="idx_incomes_starting_date", columnList = "date")
         })
 public class Income {
 
     public enum Status{
         CONFIRMED,
-        UNCONFIRMED
+        UNCONFIRMED,
+        PENDING
     }
 
     @Id
@@ -43,28 +45,62 @@ public class Income {
     @NotNull
     private BigDecimal amount;
 
-    private LocalDate startDate;
+    private LocalDate date = null;
 
     @Enumerated(EnumType.STRING)
-    private Status status = Status.UNCONFIRMED;
+    private Status status;
 
     public void setAmount(BigDecimal amount){
 
         this.amount = amount;
     }
 
-    public void setStartDate(LocalDate startDate){
+    public void setDate(LocalDate date){
 
-        if(startDate == null){
+        if(date == null){
 
             throw new IllegalArgumentException("Start date can't be null.");
         }
 
-        if(startDate.isBefore(LocalDate.now())){
+        if(date.isBefore(LocalDate.now())){
 
             throw new IllegalArgumentException("Start date can't be earlier then today.");
         }
 
-        this.startDate = startDate;
+        if(date.isEqual(LocalDate.now())){
+
+            status = Status.UNCONFIRMED;
+
+        } else {
+
+            status = Status.PENDING;
+        }
+
+        this.date = date;
+    }
+
+    public void updateStartDate(LocalDate newDate){
+
+        if(this.date == null){
+
+            throw new IllegalStateException("Date is null. Use the setDate() method.");
+        }
+
+        if(newDate == null){
+
+            throw new IllegalStateException("Date can't be null.");
+        }
+
+        if(this.date.isBefore(LocalDate.now())){
+
+            throw new IllegalStateException("Date is passed. It cannot be changed.");
+        }
+
+        if(newDate.isBefore(LocalDate.now())){
+
+            throw new IllegalArgumentException("Date can't be earlier than today.");
+        }
+
+        this.date = newDate;
     }
 }

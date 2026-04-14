@@ -1,17 +1,16 @@
 package com.stage.inex.domain.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name="recurring_expenses", indexes = {
-        @Index(name = "idx_recurring_expenses_next_generation_date", columnList = "nextGenerationDate")
+@Table(name="recurring_incomes", indexes = {
+        @Index(name="idx_recurring_incomes_next_generation_date", columnList = "next_generation_date")
 })
-public class Recurring_Expense {
+public class RecurringIncome {
 
     private enum Frequency{
         YEARLY,
@@ -39,7 +38,6 @@ public class Recurring_Expense {
     private User user;
 
     @Column(precision = 19, scale = 4, nullable = false)
-    @DecimalMin(value = "1", message = "Amount must be at least 1")
     @NotNull
     private BigDecimal amount;
 
@@ -103,14 +101,14 @@ public class Recurring_Expense {
         }
     }
 
-    public void setNextGenerationDate(){
+    public void setNextGenerationDate() {
 
         if(frequency == null){
 
             throw new IllegalStateException("Next generation date cannot be set when frequency is null.");
         }
 
-        switch (frequency){
+        switch(this.frequency){
 
             case DAILY -> nextGenerationDate = nextGenerationDate.plusDays(1);
             case WEEKLY -> nextGenerationDate = nextGenerationDate.plusWeeks(1);
