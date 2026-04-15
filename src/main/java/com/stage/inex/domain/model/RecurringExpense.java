@@ -2,16 +2,15 @@ package com.stage.inex.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
-import jdk.jfr.Frequency;
-import org.springframework.cglib.core.Local;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name="recurring_expenses", indexes = {
-        @Index(name = "idx_recurring_expenses_next_generation_date", columnList = "nextGenerationDate")
+        @Index(name = "idx_recurring_expenses_next_generation_date", columnList = "next_generation_date")
 })
 public class RecurringExpense {
 
@@ -22,9 +21,10 @@ public class RecurringExpense {
         DAILY
     }
 
-    private enum Status{
+    public enum Status{
         ACTIVE,
-        ENDED
+        ENDED,
+        CANCELED
     }
 
     @Id
@@ -32,97 +32,109 @@ public class RecurringExpense {
     private Long id;
 
     @Column(nullable = false)
-    @NotNull
     private String name;
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @NotNull
     private ExpenseCategory category;
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @NotNull
     private User user;
 
     @Column(precision = 19, scale = 4, nullable = false)
     @DecimalMin(value = "1", message = "Amount must be at least 1")
-    @NotNull
     private BigDecimal amount;
 
-    @Column(nullable = false)
-    @NotNull
-    private LocalDate startingDate = null;
+    @CreationTimestamp
+    private LocalDate createdAt;
 
-    private LocalDate endingDate = null;
+    @Column(nullable = false)
+    private LocalDate startingDate;
+
+    private LocalDate endingDate;
 
     private int repeatCount = -1;
 
     @Column(nullable = false)
-    @NotNull
     @Enumerated(EnumType.STRING)
     private Frequency frequency;
 
     @Column(nullable = false)
-    @NotNull
     private LocalDate nextGenerationDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @NotNull
     private Status status;
 
-    public void setAmount(BigDecimal amount){
+    @Column(nullable = false)
+    private LocalDate statusUpdateDate;
 
-        if(amount == null){
+    protected RecurringExpense(){};
 
-            throw  new IllegalArgumentException("Amount can't be null.");
-        }
-
-        this.amount = amount;
-    }
-
-    public void setStartingDate(LocalDate startingDate){
-
-        if(this.startingDate != null){
-
-            throw new IllegalStateException("To update the starting date, use the updateDates() method.");
-        }
-
-        if(startingDate == null){
-
-            throw  new IllegalArgumentException("Starting date can't be null.");
-        }
+    public RecurringExpense(String name, ExpenseCategory category, User user, BigDecimal amount, LocalDate startingDate, String frequency){
+        this.name = Objects.requireNonNull(name);
+        this.category = Objects.requireNonNull(category);
+        this.amount = Objects.requireNonNull(amount);
+        this.user = Objects.requireNonNull(user);
 
         if(startingDate.isBefore(LocalDate.now())){
 
             throw new IllegalArgumentException("Starting date can't be earlier than today.");
         }
 
-        this.startingDate = startingDate;
+        this.startingDate = Objects.requireNonNull(startingDate);
         nextGenerationDate = startingDate;
+
+        try{
+
+            this.frequency = Frequency.valueOf(Objects.requireNonNull(frequency).toUpperCase());
+
+        } catch (IllegalArgumentException e){
+
+            throw new IllegalArgumentException("Invalid frequency: " + frequency);
+        }
+    }
+
+    public RecurringExpense(String name, ExpenseCategory category, User user, BigDecimal amount, LocalDate startingDate, String frequency, LocalDate endingDate){
+
+        this(name, category, user, amount, startingDate, frequency);
+
+        if(endingDate.isBefore(startingDate) || endingDate.isEqual(startingDate)){
+
+            throw new IllegalStateException("Ending date must be after the start date.");
+        }
+
+        this.endingDate = endingDate;
+    }
+
+    public RecurringExpense(String name, ExpenseCategory category, User user, BigDecimal amount, LocalDate startingDate, String frequency, int repeatCount){
+
+        this(name, category, user, amount, startingDate, frequency);
+
+        if(repeatCount <= 1){
+
+            throw new IllegalArgumentException("Repeat count must be at least 2.");
+        }
+
+        this.repeatCount = repeatCount;
     }
 
     public void updateDates(LocalDate newStartingDate, LocalDate newEndingDate){    // To update the startDate. Updating the startDate requires updating the endDate.
 
-        if(this.startingDate == null){
-
-            throw new IllegalStateException("Start date is null. Use the setStartDate() method.");
-        }
-
         if(newStartingDate == null){
 
-            throw new IllegalStateException("Start date can't be null.");
+            throw new IllegalStateException("Starting date can't be null.");
         }
 
         if(newStartingDate.isBefore(LocalDate.now())){
 
-            throw new IllegalArgumentException("Start date can't be earlier than today.");
+            throw new IllegalArgumentException("Starting date can't be earlier than today.");
         }
 
         if(newEndingDate.isBefore(newStartingDate)){
 
-            throw new IllegalStateException("End date must be after the start date.");
+            throw new IllegalStateException("Ending date must be after the starting date.");
         }
 
         this.startingDate = newStartingDate;
@@ -131,68 +143,18 @@ public class RecurringExpense {
         this.endingDate = newEndingDate;
     }
 
-    public void setEndingDate(LocalDate endingDate){  // For both set and update
+    public void updateFrequency(String newFrequency){
 
-        if(startingDate== null){
-            throw new IllegalStateException("Starting date must be set before setting the ending date.");
-        }
-
-        if(endingDate == null){
-            throw new IllegalArgumentException("Ending date must be provided when updating starting date.");
-        }
-
-        if(endingDate.isBefore(startingDate) || endingDate.isEqual(startingDate)){
-
-            throw new IllegalStateException("Ending date must be after the start date.");
-        }
-
-        if(repeatCount != -1){
-
-            throw new IllegalStateException("Ending date cannot be set if the repeat count is set.");
-        }
-
-        this.endingDate = endingDate;
-    }
-
-    public void setRepeatCount(int rc){
-
-        if(endingDate != null){
-
-            throw new IllegalStateException("Repeat count cannot be set if the ending date is set.");
-        }
-
-        if(rc <= 1){
-
-            throw new IllegalArgumentException("Repeat count must be at least 2.");
-        }
-
-        repeatCount = rc;
-    }
-
-    public void setFrequency(String frequency){
-
-        if(frequency == null){
+        if(newFrequency == null){
 
             throw new IllegalArgumentException("Frequency cannot be null.");
         }
-
-        try{
-
-            this.frequency = Frequency.valueOf(frequency.toUpperCase());
-
-        } catch (IllegalArgumentException e){
-
-            throw  new IllegalArgumentException("Invalid frequency: " + frequency);
-        }
-    }
-
-    public void updateFrequency(String newFrequency){
 
         if(startingDate.isAfter(LocalDate.now())){
 
             try{
 
-                frequency = Frequency.valueOf(newFrequency);
+                frequency = Frequency.valueOf(newFrequency.toUpperCase());
 
             } catch (IllegalArgumentException e){
 
@@ -229,12 +191,12 @@ public class RecurringExpense {
        }
     }
 
-    public void active(){
+    public void activate(){
 
         status = Status.ACTIVE;
     }
 
-    public void update(){
+    public void update(){        // After the expense is added to the Expenses table.
 
         if(repeatCount > 0){
             repeatCount--;

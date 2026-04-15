@@ -1,7 +1,6 @@
 package com.stage.inex.domain.model;
 
 import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -18,17 +17,9 @@ public class User {
         UNCONFIRMED
     }
 
-    public enum Role {
-        ADMIN,
-        USER
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-    @Column(nullable = false)
-    private Role role;
 
     @Column(nullable = false)
     private String name;
@@ -40,7 +31,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String password;
+    private HashedPassword password;
 
     @CreationTimestamp
     private LocalDate createdAt;
@@ -56,7 +47,54 @@ public class User {
 
     private LocalDate deleted_at;
 
-    void validatePassword(String rawPassword){
+    protected User(){};
+
+    public User(String name, String surname, String email, HashedPassword password){
+
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+    };
+
+    public record HashedPassword(String hashedPassword){
+
+        public HashedPassword {
+
+            if(!hashedPassword.startsWith("$2")){
+
+                throw new IllegalArgumentException("Invalid hash!");
+            }
+        }
+    }
+
+    public void updatePassword(HashedPassword hashedPassword){
+
+        password = hashedPassword;
+    }
+
+    public void updateName(String name){
+
+        this.name = name;
+    }
+
+    public void updateSurname(String surname){
+
+        this.surname = surname;
+    }
+
+    public void email(String email){
+
+        this.email = email;
+    }
+
+    public void confirmUser(){
+
+        status = Status.CONFIRMED;
+    }
+
+    //Move this to domain service
+    public void validatePassword(String rawPassword){
 
         String regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*._+]).{8,}$";
 
@@ -66,9 +104,5 @@ public class User {
         if(!matcher.matches()){
             throw new IllegalArgumentException("Password doesn't meet the minimum requirements");
         }
-    }
-
-    void setHashedPassword(String hashedPassword){
-        password = hashedPassword;
     }
 }

@@ -8,99 +8,169 @@ import org.springframework.cglib.core.Local;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "incomes", indexes = {
-        @Index(name = "idx_incomes_user_id", columnList = "user"),
-        @Index(name="idx_incomes_starting_date", columnList = "date")
+        @Index(name = "idx_incomes_user_id", columnList = "user_id"),
+        @Index(name="idx_incomes_initial_date", columnList = "initial_date")
         })
 public class Income {
 
     public enum Status{
         CONFIRMED,
         UNCONFIRMED,
-        PENDING
+        PENDING,
+        CANCELED,
+        REVERTED
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
-    @NotNull
     private String name;
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @NotNull
     private IncomeCategory category;
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    @NotNull
     private User user;
 
     @Column(precision = 19, scale = 4, nullable = false)
     @DecimalMin(value = "1", message = "Amount must be at least 1")
-    @NotNull
     private BigDecimal amount;
 
-    private LocalDate date = null;
+    @CreationTimestamp
+    private LocalDate createdAt;
+
+    private LocalDate initialDate;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public void setAmount(BigDecimal amount){
+    @Column(nullable = false)
+    private LocalDate statusUpdateDate;
 
-        this.amount = amount;
+    protected Income(){};
+
+    public Income(String name, User user, BigDecimal amount, IncomeCategory category) {
+        this.name = Objects.requireNonNull(name);
+        this.category = Objects.requireNonNull(category);
+        this.amount = Objects.requireNonNull(amount);
+        this.user = Objects.requireNonNull(user);
     }
 
-    public void setDate(LocalDate date){
+    public Income(String name, User user, BigDecimal amount, IncomeCategory category, LocalDate initialDate) {
+        this(name, user, amount, category);
 
-        if(date == null){
+        if(initialDate.isBefore(LocalDate.now())){
 
-            throw new IllegalArgumentException("Start date can't be null.");
+            throw new IllegalArgumentException("Initial date can't be earlier than today.");
         }
 
-        if(date.isBefore(LocalDate.now())){
+        this.initialDate = Objects.requireNonNull(initialDate);
+    }
 
-            throw new IllegalArgumentException("Start date can't be earlier then today.");
+    public void updateInitialDate(LocalDate newInitialDate){
+
+        if(initialDate == null){
+
+            throw new IllegalStateException("Initial date is null. Use the setInitialDate method.");
         }
 
-        if(date.isEqual(LocalDate.now())){
+        if(newInitialDate == null){
 
-            status = Status.UNCONFIRMED;
+            throw new IllegalArgumentException("Initial date can't be null.");
+        }
+
+        if(this.initialDate.isBefore(LocalDate.now())){
+
+            throw new IllegalStateException("Initial date is passed. It cannot be changed.");
+        }
+
+        if(newInitialDate.isBefore(LocalDate.now())){
+
+            throw new IllegalArgumentException("Initial date can't be earlier than today.");
+        }
+
+        this.initialDate = newInitialDate;
+    }
+
+    public void activate(){   // To finalize a record without an initial date.
+
+        status = Status.CONFIRMED;
+
+        statusUpdateDate = LocalDate.now();
+    }
+
+    public void start(){   // To finalize a record with an initial date.
+
+        if(initialDate == null){
+
+            throw new IllegalStateException("Use the activate method() for the records without an initial date.");
 
         } else {
 
-            status = Status.PENDING;
-        }
+            if(initialDate.isEqual(LocalDate.now())){
 
-        this.date = date;
+                status = Status.UNCONFIRMED;
+
+            } else if(initialDate.isAfter(LocalDate.now())){
+
+                status = Status.PENDING;
+            }
+
+            statusUpdateDate = LocalDate.now();
+        }
     }
 
-    public void updateStartDate(LocalDate newDate){
+    public void updateScheduledIncomeStatus(){
 
-        if(this.date == null){
+        if(status != Status.PENDING){
 
-            throw new IllegalStateException("Date is null. Use the setDate() method.");
+            throw new IllegalStateException("Only PENDING incomes can be updated to active.");
         }
 
-        if(newDate == null){
+        if(initialDate.isAfter(LocalDate.now())){
 
-            throw new IllegalStateException("Date can't be null.");
+            throw new IllegalStateException("The initial date hasn't came yet.");
         }
 
-        if(this.date.isBefore(LocalDate.now())){
+        if(initialDate.isBefore(LocalDate.now())){
 
-            throw new IllegalStateException("Date is passed. It cannot be changed.");
+            throw new IllegalStateException("The initial date has passed.");
         }
 
-        if(newDate.isBefore(LocalDate.now())){
+        status = Status.UNCONFIRMED;
+        this.statusUpdateDate = LocalDate.now();
+    }
 
-            throw new IllegalArgumentException("Date can't be earlier than today.");
+    public void cancel(){
+
+        if(status == Status.CONFIRMED){
+
+            throw new IllegalStateException("Confirmed income record can't be canceled.");
         }
 
-        this.date = newDate;
+        status = Status.CANCELED;
+
+        statusUpdateDate = LocalDate.now();
+    }
+
+
+    public void revert(){
+
+        if(status == Status.PENDING || status == Status.UNCONFIRMED){
+
+            throw new IllegalStateException("Only confirmed income records can be reverted.");
+        }
+
+        status = Status.REVERTED;
+
+        statusUpdateDate = LocalDate.now();
     }
 }

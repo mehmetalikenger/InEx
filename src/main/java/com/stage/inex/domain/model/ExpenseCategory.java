@@ -2,6 +2,8 @@ package com.stage.inex.domain.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "expense_categories")
 public class ExpenseCategory {
@@ -12,4 +14,11 @@ public class ExpenseCategory {
 
     @Column(nullable = false)
     private String name;
+
+    protected ExpenseCategory() {};
+
+    public ExpenseCategory(String name) {
+
+        this.name = Objects.requireNonNull(name);
+    };
 }
