@@ -2,6 +2,7 @@ package com.stage.inex.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -65,6 +66,7 @@ public class RecurringIncome {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NotNull(message = "Status cannot be null. Use the activate() method to activate the income record.")
     private Status status;
 
     @Column(nullable = false)
@@ -182,19 +184,13 @@ public class RecurringIncome {
             case MONTHLY -> nextGenerationDate = nextGenerationDate.plusMonths(1);
             case YEARLY -> nextGenerationDate = nextGenerationDate.plusYears(1);
         }
-
-        if(endingDate != null){
-
-            if(nextGenerationDate.isAfter(endingDate)){
-
-                status = Status.ENDED;
-            }
-        }
     }
 
     public void activate(){
 
         status = Status.ACTIVE;
+
+        statusUpdateDate = LocalDate.now();
     }
 
     public void update(){        // After the income is added to the Incomes table.
@@ -218,5 +214,18 @@ public class RecurringIncome {
                 status = Status.ENDED;
             }
         }
+
+        statusUpdateDate = LocalDate.now();
+    }
+
+    public void cancel(){
+
+        if(!(status == Status.ACTIVE)){
+
+            throw new IllegalStateException("Only the records with the ACTIVE status can be canceled.");
+        }
+
+        status = Status.CANCELED;
+        statusUpdateDate = LocalDate.now();
     }
 }
