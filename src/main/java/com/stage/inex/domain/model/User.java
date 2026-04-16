@@ -31,7 +31,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private HashedPassword password;
+    private String password;
 
     @CreationTimestamp
     private LocalDate createdAt;
@@ -54,7 +54,7 @@ public class User {
         this.name = name;
         this.surname = surname;
         this.email = email;
-        this.password = password;
+        this.password = password.hashedPassword;
     };
 
     public record HashedPassword(String hashedPassword){
@@ -70,7 +70,7 @@ public class User {
 
     public void updatePassword(HashedPassword hashedPassword){
 
-        password = hashedPassword;
+        password = hashedPassword.hashedPassword;
     }
 
     public void updateName(String name){
