@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +25,6 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private String surname;
 
     @Column(nullable = false)
@@ -45,15 +45,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Expense> expenses;
 
-    private LocalDate deleted_at;
+    private LocalDate deletedAt;
 
     protected User(){};
 
     public User(String name, String surname, String email, HashedPassword password){
 
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
         this.surname = surname;
-        this.email = email;
+        this.email = Objects.requireNonNull(email);
         this.password = password.hashedPassword;
     };
 
@@ -83,7 +83,7 @@ public class User {
         this.surname = surname;
     }
 
-    public void email(String email){
+    public void updateEmail(String email){
 
         this.email = email;
     }
@@ -91,18 +91,5 @@ public class User {
     public void confirmUser(){
 
         status = Status.CONFIRMED;
-    }
-
-    //Move this to domain service
-    public void validatePassword(String rawPassword){
-
-        String regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*._+]).{8,}$";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(rawPassword);
-
-        if(!matcher.matches()){
-            throw new IllegalArgumentException("Password doesn't meet the minimum requirements");
-        }
     }
 }
