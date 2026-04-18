@@ -19,7 +19,7 @@ public class UserRegistrationController {
         this.userRegistrationService = userRegistrationService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/user")
     public ResponseEntity<Void> register(@RequestBody @Valid UserRegistrationDTO dto){
 
         userRegistrationService.register(dto);
