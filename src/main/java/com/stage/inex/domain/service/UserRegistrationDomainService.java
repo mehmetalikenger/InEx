@@ -1,6 +1,6 @@
 package com.stage.inex.domain.service;
 
-import com.stage.inex.domain.PasswordEncoder;
+import com.stage.inex.domain.port.PasswordEncoder;
 import com.stage.inex.domain.data.UserRegistrationData;
 import com.stage.inex.domain.exception.EmailAlreadyTakenException;
 import com.stage.inex.domain.model.User;
@@ -34,11 +34,11 @@ public class UserRegistrationDomainService {
 
         validatePassword(rd.password());
 
-        String hashedPassword = passwordEncoder.encode(rd.password());
+        String encodedPassword = passwordEncoder.encode(rd.password());
 
-        User.HashedPassword validatedHashedPassword = new User.HashedPassword(hashedPassword);
+        User.EncodedPassword validatedEncodedPassword = new User.EncodedPassword(encodedPassword);
 
-        User user = new User(rd.name(), rd.surname(), rd.email(), validatedHashedPassword);
+        User user = new User(rd.name(), rd.surname(), rd.email(), validatedEncodedPassword);
 
         userRepository.save(user);
     }

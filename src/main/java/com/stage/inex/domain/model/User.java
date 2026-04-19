@@ -2,20 +2,23 @@ package com.stage.inex.domain.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.jspecify.annotations.NonNull;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Entity
 @Table(name="users")
-public class User {
+public class User implements UserDetails {
 
     public enum Status {
         CONFIRMED,
-        UNCONFIRMED
+        UNCONFIRMED,
+        DELETED
     }
 
     @Id
@@ -45,32 +48,38 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Expense> expenses;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<RecurringIncome> recurringIncomes;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<RecurringExpense> recurringExpenses;
+
     private LocalDate deletedAt;
 
     protected User(){};
 
-    public User(String name, String surname, String email, HashedPassword password){
+    public User(String name, String surname, String email, EncodedPassword password){
 
         this.name = Objects.requireNonNull(name);
         this.surname = surname;
         this.email = Objects.requireNonNull(email);
-        this.password = password.hashedPassword;
+        this.password = password.encodedPassword;
     };
 
-    public record HashedPassword(String hashedPassword){
+    public record EncodedPassword(String encodedPassword){
 
-        public HashedPassword {
+        public EncodedPassword {
 
-            if(!hashedPassword.startsWith("$2")){
+            if(!encodedPassword.startsWith("$2")){
 
                 throw new IllegalArgumentException("Invalid hash!");
             }
         }
     }
 
-    public void updatePassword(HashedPassword hashedPassword){
+    public void updatePassword(EncodedPassword hashedPassword){
 
-        password = hashedPassword.hashedPassword;
+        password = hashedPassword.encodedPassword;
     }
 
     public void updateName(String name){
@@ -91,5 +100,27 @@ public class User {
     public void confirmUser(){
 
         status = Status.CONFIRMED;
+    }
+
+    @Override
+    @NonNull
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    @NonNull
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+
+        return status != Status.DELETED;
     }
 }

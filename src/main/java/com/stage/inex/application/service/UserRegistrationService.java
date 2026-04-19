@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserRegistrationService {
 
-    UserRegistrationDomainService userRegistrationDomainService;
+    private final UserRegistrationDomainService userRegistrationDomainService;
 
     public UserRegistrationService(UserRegistrationDomainService userRegistrationDomainService){
 

@@ -1,5 +1,6 @@
 package com.stage.inex.infrastructure.security;
-import com.stage.inex.domain.PasswordEncoder;
+import com.stage.inex.domain.port.TokenGenerator;
+import com.stage.inex.domain.port.PasswordEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

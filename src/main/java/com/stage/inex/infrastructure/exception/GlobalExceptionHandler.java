@@ -1,27 +1,29 @@
 package com.stage.inex.infrastructure.exception;
 
 import com.stage.inex.domain.exception.EmailAlreadyTakenException;
+import com.stage.inex.domain.exception.PasswordsDoNotMatchException;
+import com.stage.inex.domain.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import tools.jackson.databind.util.JSONPObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyTakenException.class)
-    public ResponseEntity<Map<String, String>> handleEmailAlreadyTaken(EmailAlreadyTakenException ex){
+    public ResponseEntity<HashMap<String, HashMap<String, String>>> handleEmailAlreadyTaken(EmailAlreadyTakenException ex){
 
-        Map<String, String> errorDetails = new HashMap<>();
+        HashMap<String, String> errorMessage = new HashMap<>();
+        HashMap<String, HashMap<String, String>> errorDetails = new HashMap<>();
 
-        errorDetails.put("message", ex.getMessage());
+        errorMessage.put("message", ex.getMessage());
+        errorDetails.put("email", errorMessage);
 
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
@@ -29,15 +31,39 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<HashMap<String, HashMap<String, String>>> handleMethodArgumentNotValidException (MethodArgumentNotValidException ex){
 
-        HashMap<String, HashMap<String, String>> errorDetail = new HashMap<>();
+        HashMap<String, HashMap<String, String>> errorDetails = new HashMap<>();
 
         for(FieldError error : ex.getFieldErrors()){
 
             HashMap<String, String> errorMessage = new HashMap<>();
             errorMessage.put("message", error.getDefaultMessage());
-            errorDetail.put(error.getField(), errorMessage);
+            errorDetails.put(error.getField(), errorMessage);
         }
 
-        return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<HashMap<String, HashMap<String, String>>> handleUserNotFoundException(RuntimeException ex){
+
+        HashMap<String, String> errorMessage = new HashMap<>();
+        HashMap<String, HashMap<String, String>> errorDetails = new HashMap<>();
+
+        errorMessage.put("message", ex.getMessage());
+        errorDetails.put("email", errorMessage);
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PasswordsDoNotMatchException.class)
+    public ResponseEntity<HashMap<String, HashMap<String, String>>> handlePasswordsDoNotMatchException(RuntimeException ex){
+
+        HashMap<String, String> errorMessage = new HashMap<>();
+        HashMap<String, HashMap<String, String>> errorDetails = new HashMap<>();
+
+        errorMessage.put("message", ex.getMessage());
+        errorDetails.put("password", errorMessage);
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 }
