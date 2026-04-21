@@ -1,4 +1,5 @@
 package com.stage.inex.infrastructure.security;
+import com.stage.inex.domain.port.PasswordValidator;
 import com.stage.inex.domain.port.TokenGenerator;
 import com.stage.inex.domain.port.PasswordEncoder;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,12 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder(){
 
         return new PasswordEncoderImp();
+    }
+
+    @Bean
+    public PasswordValidator passwordValidator(){
+
+        return new PasswordValidatorImp();
     }
 
     @Bean

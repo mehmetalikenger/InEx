@@ -37,10 +37,7 @@ public class UserAuthDomainService {
 
         User user = dbUser.get();
 
-        if(!passwordEncoder.matches(data.password(), user.getPassword())){
-
-            throw new PasswordsDoNotMatchException("Passwords do not match.");
-        }
+        passwordEncoder.matches(data.password(), user.getPassword());
 
         return new AuthResponseData(tokenGenerator.generateAccessToken(user),
                 tokenGenerator.generateRefreshToken(user));
