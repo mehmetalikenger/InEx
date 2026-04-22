@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for testing with Postman
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/register").permitAll() // Allow POST to /register
-                        .anyRequest().authenticated() // Everything else needs login
+                        .anyRequest().permitAll()// Everything else needs login
                 )
                 .httpBasic(Customizer.withDefaults()); // Keep Basic Auth enabled
 

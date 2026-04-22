@@ -1,4 +1,4 @@
-package com.stage.inex;
+package com.stage.inex.unitTest;
 
 import com.stage.inex.infrastructure.security.PasswordValidatorImp;
 import org.junit.jupiter.api.Tag;
@@ -49,7 +49,6 @@ public class PasswordValidatorTests {
             passwordValidator.validate("zae.zae.");
         });
     }
-
 
     @Test
     @Tag(value = "failure")

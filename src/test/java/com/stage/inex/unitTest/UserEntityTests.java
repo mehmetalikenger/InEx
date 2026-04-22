@@ -1,4 +1,4 @@
-package com.stage.inex;
+package com.stage.inex.unitTest;
 
 import com.stage.inex.domain.model.User;
 import org.junit.jupiter.api.Tag;
