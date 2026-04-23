@@ -39,7 +39,7 @@ public class UserAuthDomainService {
 
         passwordEncoder.matches(data.password(), user.getPassword());
 
-        return new AuthResponseData(tokenGenerator.generateAccessToken(user),
-                tokenGenerator.generateRefreshToken(user));
+        return new AuthResponseData(tokenGenerator.generateAccessToken(user.getEmail()),
+                tokenGenerator.generateRefreshToken(user.getEmail()));
     }
 }

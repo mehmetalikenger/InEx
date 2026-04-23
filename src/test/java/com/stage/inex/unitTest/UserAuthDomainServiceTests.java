@@ -34,7 +34,7 @@ public class UserAuthDomainServiceTests {
     TokenGenerator tokenGenerator;
 
     @Test
-    @Tag(value="failure")
+    @Tag(value = "failure")
     public void shouldThrowWhenEmailDoesNotExistInUsersTable(){
 
         when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.empty());
@@ -46,7 +46,7 @@ public class UserAuthDomainServiceTests {
     @Tag(value = "success")
     public void shouldAuthenticateUserSuccessful(){
 
-        User user = new User("mali", "kenger", "testqgmail.com", new User.EncodedPassword("$2"));
+        User user = new User("mali", "kenger", "test@gmail.com", new User.EncodedPassword("$2"));
 
         when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
 

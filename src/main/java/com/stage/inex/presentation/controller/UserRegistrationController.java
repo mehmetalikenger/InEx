@@ -4,6 +4,7 @@ import com.stage.inex.application.service.UserRegistrationService;
 import com.stage.inex.presentation.dto.UserRegistrationDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,10 +20,10 @@ public class UserRegistrationController {
     }
 
     @PostMapping("/user")
-    public HttpStatus register(@RequestBody @Valid UserRegistrationDTO dto){
+    public ResponseEntity<Void> register(@RequestBody @Valid UserRegistrationDTO dto){
 
         userRegistrationService.register(dto);
 
-        return HttpStatus.CREATED;
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

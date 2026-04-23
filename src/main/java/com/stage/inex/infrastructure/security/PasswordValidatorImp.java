@@ -15,7 +15,10 @@ public class PasswordValidatorImp implements PasswordValidator {
         Matcher matcher = pattern.matcher(rawPassword);
 
         if(!matcher.matches()){
-            throw new IllegalArgumentException("Password doesn't meet the requirements.");
+            throw new IllegalArgumentException("Password should be minimum 8 characters long. " +
+                    "Password should contain at least one lowercase, " +
+                    "one uppercase, one number and one special character. " +
+                    "Allowed special characters are (!@#%^&*._+)");
         }
     }
 }

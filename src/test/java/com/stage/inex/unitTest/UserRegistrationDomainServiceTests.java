@@ -37,7 +37,7 @@ public class UserRegistrationDomainServiceTests {
     @Tag(value = "failure")
     public void shouldThrowExceptionWhenEmailIsAlreadyTaken(){
 
-        User user = new User("mali", "kenger", "testqgmail.com", new User.EncodedPassword("$2"));
+        User user = new User("mali", "kenger", "test@gmail.com", new User.EncodedPassword("$2"));
 
         when(userRepository.findByEmail("existing@email.com")).thenReturn(Optional.of(user));
 

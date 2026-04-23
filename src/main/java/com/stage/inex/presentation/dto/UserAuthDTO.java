@@ -5,10 +5,10 @@ import jakarta.validation.constraints.*;
 
 public record UserAuthDTO(
 
-        @NotBlank(message = "Email can't be blank.")
-        @Email
+        @Email(message = "Email is not valid.")
+        @NotBlank(message = "Email cannot be blank.")
         String email,
 
-        @NotBlank(message = "Password can't be blank.")
+        @NotBlank(message = "Password cannot be blank.")
         String password
 ) {}

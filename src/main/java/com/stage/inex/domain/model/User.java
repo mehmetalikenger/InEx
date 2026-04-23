@@ -123,4 +123,8 @@ public class User implements UserDetails {
 
         return status != Status.DELETED;
     }
+
+    public String getEmail() {
+        return email;
+    }
 }

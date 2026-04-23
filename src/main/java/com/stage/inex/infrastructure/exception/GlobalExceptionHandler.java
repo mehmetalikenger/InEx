@@ -3,6 +3,10 @@ package com.stage.inex.infrastructure.exception;
 import com.stage.inex.domain.exception.EmailAlreadyTakenException;
 import com.stage.inex.domain.exception.PasswordsDoNotMatchException;
 import com.stage.inex.domain.exception.UserNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.HashMap;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -51,11 +56,23 @@ public class GlobalExceptionHandler {
         errorMessage.put("message", ex.getMessage());
         errorDetails.put("email", errorMessage);
 
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PasswordsDoNotMatchException.class)
     public ResponseEntity<HashMap<String, HashMap<String, String>>> handlePasswordsDoNotMatchException(RuntimeException ex){
+
+        HashMap<String, String> errorMessage = new HashMap<>();
+        HashMap<String, HashMap<String, String>> errorDetails = new HashMap<>();
+
+        errorMessage.put("message", ex.getMessage());
+        errorDetails.put("password", errorMessage);
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<HashMap<String, HashMap<String, String>>> handleIllegalArgumentException(IllegalArgumentException ex){
 
         HashMap<String, String> errorMessage = new HashMap<>();
         HashMap<String, HashMap<String, String>> errorDetails = new HashMap<>();

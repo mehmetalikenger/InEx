@@ -22,7 +22,7 @@ public class UserRegistrationControllerTests {
     private UserRegistrationService userRegistrationService;
 
     @Test
-    @Tag("failure")
+    @Tag(value = "failure")
     void shouldThrowWhenNameIsBlank(){
 
         restTestClient.post()
@@ -33,7 +33,7 @@ public class UserRegistrationControllerTests {
                               {
                                 "name": "",
                                 "surname": "kenger",
-                                "email": "",
+                                "email": "test@email.com",
                                 "password": "Zxcv123.4"
                               }
                         """
@@ -45,7 +45,7 @@ public class UserRegistrationControllerTests {
     }
 
     @Test
-    @Tag("failure")
+    @Tag(value = "failure")
     void shouldThrowWhenEmailIsBlank(){
 
         restTestClient.post()
@@ -68,7 +68,7 @@ public class UserRegistrationControllerTests {
     }
 
     @Test
-    @Tag("failure")
+    @Tag(value = "failure")
     void shouldThrowWhenPasswordIsBlank(){
 
         restTestClient.post()
@@ -77,7 +77,7 @@ public class UserRegistrationControllerTests {
                 .body(
                         """
                               {
-                                "name": "",
+                                "name": "mali",
                                 "surname": "kenger",
                                 "email": "test@email.com",
                                 "password": ""
@@ -94,7 +94,7 @@ public class UserRegistrationControllerTests {
     }
 
     @Test
-    @Tag("failure")
+    @Tag(value = "failure")
     void shouldThrowWhenEmailIsNotValid(){
 
         restTestClient.post()
@@ -103,10 +103,10 @@ public class UserRegistrationControllerTests {
                 .body(
                         """
                               {
-                                "name": "",
+                                "name": "mali",
                                 "surname": "kenger",
                                 "email": "test",
-                                "password": ""
+                                "password": "Zxcv123.4"
                               }
                         """
                 )
@@ -117,7 +117,7 @@ public class UserRegistrationControllerTests {
     }
 
     @Test
-    @Tag("failure")
+    @Tag(value = "failure")
     void shouldThrowWhenPasswordIsShort(){
 
         restTestClient.post()
@@ -126,9 +126,9 @@ public class UserRegistrationControllerTests {
                 .body(
                         """
                               {
-                                "name": "",
+                                "name": "mali",
                                 "surname": "kenger",
-                                "email": "test",
+                                "email": "test@email.com",
                                 "password": "Zxcv"
                               }
                         """
@@ -143,8 +143,8 @@ public class UserRegistrationControllerTests {
     }
 
     @Test
-    @Tag("failure")
-    void shouldThrowWhenPasswordIsNotValid(){
+    @Tag(value = "failure")
+    void shouldThrowWhenPasswordDoNotHaveSpecialChar(){
 
         restTestClient.post()
                 .uri("/user")
@@ -152,9 +152,9 @@ public class UserRegistrationControllerTests {
                 .body(
                         """
                               {
-                                "name": "",
+                                "name": "mali",
                                 "surname": "kenger",
-                                "email": "test",
+                                "email": "test@email.com",
                                 "password": "Zxcv1234"
                               }
                         """
@@ -167,5 +167,4 @@ public class UserRegistrationControllerTests {
                         "one uppercase, one number and one special character. " +
                         "Allowed special characters are (!@#%^&*._+)");
     }
-
 }
