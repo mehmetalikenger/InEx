@@ -38,21 +38,22 @@ public class JwtService implements TokenGenerator {
 
     @Override
     public String generateAccessToken(String email) {
-        return  generateToken(email, Integer.parseInt(accessTokenExpTime));
+        return  generateToken(email, false, Integer.parseInt(accessTokenExpTime));
     }
 
     @Override
-    public String generateRefreshToken(String email) {
-        return generateToken(email, Integer.parseInt(refreshTokenExpTime));
+    public String generateRefreshToken(String email, Boolean rememberMe) {
+        return generateToken(email, rememberMe, Integer.parseInt(refreshTokenExpTime));
     }
 
-    public String generateToken(String email, int expSeconds){
+    public String generateToken(String email, Boolean rememberMe, int expSeconds){
 
         Instant now = Instant.now();
 
         return Jwts
                 .builder()
                 .subject(email)
+                .claim("rememberMe", rememberMe)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(expSeconds)))
                 .signWith(secretKey)

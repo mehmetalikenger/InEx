@@ -1,5 +1,6 @@
 package com.stage.inex.infrastructure.security;
 
+import com.stage.inex.domain.exception.InvalidJwtException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtException;
@@ -19,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.Date;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -41,29 +43,37 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = authHeader.substring(7);
+        String token = authHeader.substring(7);
 
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKeyString));
 
-        Jwt<?,?> jwt;
+        Jwt<?,?> jwt = null;
 
         try{
 
             jwt = Jwts.parser()
                     .verifyWith(key)
                     .build()
-                    .parseSignedClaims(accessToken);
+                    .parseSignedClaims(token);
 
         } catch (JwtException ex) {
 
-            throw new ServletException();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(ex.getMessage());
+            return;
         }
 
         Claims claims = (Claims) jwt.getPayload();
         String email = claims.getSubject();
+        Boolean rememberMe = (Boolean) claims.get("rememberMe");
+
+        Date exp = claims.getExpiration();
+
+        System.out.println(rememberMe + "\n" + exp);
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(email, null, null);
+        Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(email, rememberMe, null);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);

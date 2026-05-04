@@ -1,10 +1,9 @@
 package com.stage.inex.infrastructure.exception;
 
 import com.stage.inex.domain.exception.EmailAlreadyTakenException;
+import com.stage.inex.domain.exception.InvalidJwtException;
 import com.stage.inex.domain.exception.PasswordsDoNotMatchException;
 import com.stage.inex.domain.exception.UserNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

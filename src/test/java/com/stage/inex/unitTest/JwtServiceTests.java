@@ -26,7 +26,7 @@ public class JwtServiceTests {
     @Tag(value = "success")
     void shouldGenerateJwtSuccessfully(){
 
-        String token = jwtService.generateToken("test@email.com", 3600);
+        String token = jwtService.generateToken("test@email.com", false, 3600);
 
         Pattern pattern = Pattern.compile("^ey.*\\.ey.*\\..*$");
         Matcher matcher = pattern.matcher(token);

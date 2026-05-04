@@ -30,7 +30,8 @@ public class LoginTests {
                         """
                             {
                                 "email": "jane@email.com",
-                                "password": "Zxcv123.4"
+                                "password": "Zxcv123.4",
+                                "rememberMe": true
                             }
                         """
                 )
@@ -52,7 +53,8 @@ public class LoginTests {
                         """
                             {
                                 "email": "test@email.com",
-                                "password": "Zxcv1234."
+                                "password": "Zxcv1234.",
+                                "rememberMe": true
                             }
                         """
                 )
@@ -74,7 +76,8 @@ public class LoginTests {
                         """
                             {
                                 "email": "test@email.com",
-                                "password": "Zxcv123.4"
+                                "password": "Zxcv123.4",
+                                "rememberMe": true
                             }
                         """
                 )

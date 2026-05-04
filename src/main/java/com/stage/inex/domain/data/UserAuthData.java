@@ -1,4 +1,4 @@
 package com.stage.inex.domain.data;
 
-public record UserAuthData(String email, String password)
+public record UserAuthData(String email, String password, Boolean rememberMe)
 {}

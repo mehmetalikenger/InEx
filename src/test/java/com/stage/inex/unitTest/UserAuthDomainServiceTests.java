@@ -39,7 +39,7 @@ public class UserAuthDomainServiceTests {
 
         when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> userAuthDomainService.authenticate(new UserAuthData("test@email.com", "123")));
+        assertThrows(RuntimeException.class, () -> userAuthDomainService.authenticate(new UserAuthData("test@email.com", "123", true)));
     }
 
     @Test
@@ -50,6 +50,6 @@ public class UserAuthDomainServiceTests {
 
         when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
 
-        userAuthDomainService.authenticate(new UserAuthData("test@email.com", "123"));
+        userAuthDomainService.authenticate(new UserAuthData("test@email.com", "123", true));
     }
 }

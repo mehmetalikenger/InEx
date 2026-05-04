@@ -3,7 +3,6 @@ package com.stage.inex.domain.service;
 import com.stage.inex.domain.data.AuthResponseData;
 import com.stage.inex.domain.port.PasswordEncoder;
 import com.stage.inex.domain.data.UserAuthData;
-import com.stage.inex.domain.exception.PasswordsDoNotMatchException;
 import com.stage.inex.domain.exception.UserNotFoundException;
 import com.stage.inex.domain.model.User;
 import com.stage.inex.domain.port.TokenGenerator;
@@ -40,6 +39,6 @@ public class UserAuthDomainService {
         passwordEncoder.matches(data.password(), user.getPassword());
 
         return new AuthResponseData(tokenGenerator.generateAccessToken(user.getEmail()),
-                tokenGenerator.generateRefreshToken(user.getEmail()));
+                tokenGenerator.generateRefreshToken(user.getEmail(), data.rememberMe()));
     }
 }
